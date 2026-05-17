@@ -1,0 +1,611 @@
+/* ============================================================
+   Sophia Lynn Li — writing site
+   Hero: light through pool water (caustics over cyan).
+   Body: calm off-white, editorial typography.
+   Footer: deep slate.
+   ============================================================ */
+
+:root {
+  /* surfaces */
+  --bg-page:     #f4f6f8;
+  --bg-section:  #f4f6f8;
+  --bg-footer:   #74b1dc;   /* brighter — same blue character, lifted ~21 across channels */
+
+  /* ink */
+  --ink:        #2d4452;
+  --ink-soft:   #4e6878;
+  --ink-muted:  #8aa0b0;
+
+  /* Blue accents — tuned to the same hue family as the water (rather
+     than the previous gray-slate). Hierarchy:
+       --slate-italic  light vibrant blue, for italic category headings
+       --slate         medium vibrant blue, for nav links when scrolled
+       --slate-deep    deeper blue, for section titles
+       --slate-darker  deepest, for the nav name when scrolled */
+  --slate:        #4880ad;
+  --slate-italic: #5a8bb8;
+  --slate-deep:   #2f5a8a;
+  --slate-darker: #1f4569;
+
+  --rule: rgba(72, 128, 173, 0.2);
+
+  --light:       rgba(255, 255, 255, 0.96);
+  --light-soft:  rgba(255, 255, 255, 0.7);
+  --light-faint: rgba(255, 255, 255, 0.45);
+
+  /* type */
+  --serif-display: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+  --serif-body:    "EB Garamond", "Cormorant Garamond", Georgia, serif;
+  --sans:          "Inter", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--serif-body);
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--bg-page);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(91, 122, 140, 0.22);
+  color: var(--slate-deep);
+}
+
+a { color: inherit; }
+
+/* ============================================================
+   NAV — permanent banner. Transparent with white text over the
+   hero, fills with cream + blur + slate text once the user
+   scrolls past the hero into the content.
+   ============================================================ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1.4rem 2.5rem;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.5s ease,
+              border-bottom-color 0.5s ease,
+              padding 0.4s ease;
+}
+
+.nav.is-scrolled {
+  background: rgba(244, 246, 248, 0.92);
+  border-bottom-color: var(--rule);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-name {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  text-shadow: 0 1px 8px rgba(80, 110, 145, 0.4);
+  transition: color 0.4s ease, text-shadow 0.4s ease, opacity 0.3s ease;
+}
+
+.nav-name:hover { opacity: 0.8; }
+
+.nav.is-scrolled .nav-name {
+  color: var(--slate-darker);
+  text-shadow: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2.6rem;
+}
+
+.nav-links a {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  text-shadow: 0 1px 8px rgba(80, 110, 145, 0.4);
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.nav-links a:hover { color: #ffffff; }
+
+.nav.is-scrolled .nav-links a {
+  color: var(--slate);
+  text-shadow: none;
+}
+
+.nav.is-scrolled .nav-links a:hover { color: var(--slate-deep); }
+
+/* ============================================================
+   HERO — content sits in the lower portion of the viewport, on a
+   soft pale-blue field (no water image).
+   ============================================================ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  overflow: hidden;
+  padding: 0 2rem 18vh;
+  color: var(--light);
+  isolation: isolate;
+}
+
+/* Blurred pool image as a subtle texture under a pale-slate wash.
+   The wash (semi-transparent rgba over the image) is what keeps the
+   feel light; the image peeks through at 25-35% to add atmospheric
+   variation rather than literal water. Heavy blur + saturation cut
+   abstracts the caustics into a soft painterly field.
+   inset: -3% hides the blur halo at the edges. */
+.water-bg {
+  position: absolute;
+  inset: -3%;
+  z-index: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(118, 175, 228, 0.5) 0%,
+      rgba(102, 165, 222, 0.56) 30%,
+      rgba(115, 175, 225, 0.64) 55%,
+      rgba(168, 205, 230, 0.8) 78%,
+      rgba(218, 228, 236, 0.96) 92%,
+      rgba(244, 246, 248, 1) 100%),
+    url("assets/water.png") center center / cover no-repeat;
+  filter: blur(5.5px) saturate(1.02) brightness(1.04);
+}
+
+/* Procedural noise layers no longer needed — the image carries the look */
+.caustics,
+.caustics-1,
+.caustics-2 { display: none; }
+
+/* Gentle dissolve into the cream writing section. The background
+   gradient already drains to near-cream at the bottom, so this is a
+   short, final blend rather than the heavy lift it used to be. */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22vh;
+  background: linear-gradient(
+    to bottom,
+    rgba(244, 246, 248, 0) 0%,
+    rgba(244, 246, 248, 0.1) 35%,
+    rgba(244, 246, 248, 0.35) 65%,
+    rgba(244, 246, 248, 0.75) 88%,
+    rgba(244, 246, 248, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 3;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.hero-name {
+  font-family: "EB Garamond", "Cormorant Garamond", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.8rem, 7vw, 4.8rem);
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  text-shadow:
+    0 1px 18px rgba(80, 110, 145, 0.45),
+    0 1px 2px rgba(80, 110, 145, 0.3);
+}
+
+.hero-categories {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.94);
+  margin-bottom: 4rem;
+  text-shadow:
+    0 1px 12px rgba(80, 110, 145, 0.5),
+    0 0 3px rgba(80, 110, 145, 0.3);
+}
+
+.scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: #ffffff;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  text-shadow: 0 1px 8px rgba(40, 70, 105, 0.45);
+}
+.scroll-cue:hover { opacity: 1; }
+
+.scroll-cue-text {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.scroll-cue-line {
+  display: block;
+  width: 1px;
+  height: 38px;
+  background: currentColor;
+  animation: cue-pulse 3s ease-in-out infinite;
+}
+
+@keyframes cue-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.95; }
+}
+
+/* ============================================================
+   SECTIONS (writing + about)
+   ============================================================ */
+.section {
+  padding: 8rem 2.5rem;
+  background: var(--bg-section);
+}
+
+/* the writing section sits immediately under the hero — pull it up
+   slightly so the cream meets the fade overlay seamlessly */
+#writing { padding-top: 4rem; }
+
+.section-inner {
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: var(--serif-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.005em;
+  color: var(--slate-deep);
+  margin-bottom: 5rem;
+}
+
+/* About and Contact have no h2 now — give the eyebrow standalone room */
+.section-about .eyebrow,
+.section-contact .eyebrow {
+  margin-bottom: 3rem;
+}
+
+/* ============================================================
+   WRITING — categories + lists
+   ============================================================ */
+.category {
+  margin-bottom: 4.5rem;
+}
+.category:last-child { margin-bottom: 0; }
+
+.category h3 {
+  font-family: var(--serif-display);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.5rem;
+  letter-spacing: 0.005em;
+  color: var(--slate-italic);
+  margin-bottom: 1.4rem;
+}
+
+.works {
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.works li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.works a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2rem;
+  padding: 1.6rem 0.4rem;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  transition: background 0.5s ease, padding 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.works a:hover,
+.works a:focus-visible {
+  background: linear-gradient(90deg, rgba(91, 122, 140, 0.06), transparent 75%);
+  padding-left: 1.1rem;
+  outline: none;
+}
+
+.work-title {
+  font-family: var(--serif-body);
+  font-size: 1.12rem;
+  line-height: 1.45;
+  color: var(--ink);
+  flex: 1;
+}
+
+.work-meta {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+
+/* ============================================================
+   ABOUT — portrait + prose, blended (no hard frame)
+   ============================================================ */
+.about-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 4.5rem;
+  align-items: start;
+}
+
+.portrait-frame {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+  background: transparent;
+  border: none;
+}
+
+.portrait-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  border-radius: 50%;
+  /* longer multi-stop falloff so the photo edges truly dissolve
+     into the page instead of showing a soft but visible ring */
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 42%,
+    #000 28%,
+    rgba(0, 0, 0, 0.88) 50%,
+    rgba(0, 0, 0, 0.5) 72%,
+    rgba(0, 0, 0, 0.15) 88%,
+    transparent 100%
+  );
+          mask-image: radial-gradient(
+    circle at 50% 42%,
+    #000 28%,
+    rgba(0, 0, 0, 0.88) 50%,
+    rgba(0, 0, 0, 0.5) 72%,
+    rgba(0, 0, 0, 0.15) 88%,
+    transparent 100%
+  );
+}
+
+/* placeholder until assets/portrait.jpg exists */
+.portrait-frame.is-empty img { display: none; }
+
+.portrait-frame.is-empty::after {
+  content: "SLL";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, #d8e9f1 0%, #8ab2c4 60%, #5b7a8c 100%);
+  border-radius: 50%;
+  font-family: var(--serif-display);
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 2.6rem;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  -webkit-mask-image: radial-gradient(circle at 50% 48%, #000 55%, transparent 92%);
+          mask-image: radial-gradient(circle at 50% 48%, #000 55%, transparent 92%);
+}
+
+.bio-prose {
+  font-family: var(--serif-body);
+  font-size: 1.12rem;
+  line-height: 1.85;
+  color: var(--ink-soft);
+}
+
+.bio-prose p + p { margin-top: 1.3rem; }
+
+/* ============================================================
+   CONTACT — deep slate footer
+   ============================================================ */
+.section-contact {
+  background: var(--bg-footer);
+  color: var(--light);
+  text-align: center;
+  padding: 7rem 2.5rem 3rem;
+}
+
+.contact-inner { max-width: 720px; }
+
+.eyebrow-light { color: rgba(255, 255, 255, 0.6); }
+
+.section-title-light {
+  color: var(--light);
+  margin-bottom: 2.2rem;
+}
+
+.contact-body {
+  font-family: var(--serif-display);
+  font-weight: 300;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--light);
+  opacity: 0.9;
+  max-width: 36ch;
+  margin: 0 auto 3rem;
+}
+
+.contact-social {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+.contact-social a {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--light);
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+.contact-social a:hover { opacity: 1; }
+
+.copyright {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.5);
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+a:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* ============================================================
+   GENTLE REVEAL ON SCROLL
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 860px) {
+  .section { padding: 6rem 1.75rem; }
+  #writing { padding-top: 3rem; }
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .portrait-frame {
+    max-width: 260px;
+    margin: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav { padding: 1rem 1.5rem; }
+  .nav-links { gap: 1.6rem; }
+  .nav-links a { font-size: 0.66rem; letter-spacing: 0.18em; }
+  .nav-name { font-size: 0.72rem; letter-spacing: 0.2em; }
+
+  .hero { padding: 5rem 1.5rem 6rem; }
+  .hero-line { margin-bottom: 3.5rem; }
+
+  .section { padding: 5rem 1.5rem; }
+  .section-title { margin-bottom: 3.5rem; }
+
+  .works a {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    padding: 1.25rem 0.4rem;
+  }
+  .work-meta { padding-top: 0; }
+
+  .portrait-frame {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .section-contact { padding: 5rem 1.5rem 2.5rem; }
+  .contact-email { font-size: 1.1rem; word-break: break-all; }
+  .contact-social { gap: 1.6rem; }
+}
+
+@media (max-width: 420px) {
+  body { font-size: 17px; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .caustics-1,
+  .caustics-2,
+  .scroll-cue-line {
+    animation: none !important;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+}
